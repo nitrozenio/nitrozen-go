@@ -1,0 +1,1307 @@
+openapi: 3.0.3
+info:
+  contact:
+    name: Nitrozen Support
+  description: |
+    The Nitrozen API allows you to programmatically manage your changelog projects and entries.
+
+    ## Authentication
+
+    All authenticated endpoints require a Bearer token. Create an API token from your
+    [API Tokens](/api-tokens) page, then include it in the `Authorization` header:
+
+    ```
+    Authorization: Bearer YOUR_TOKEN_HERE
+    ```
+
+    ## Rate Limiting
+
+    API rate limits are determined by your plan. Each plan specifies a `api_rate_limit` value
+    (requests per minute). When the limit is exceeded, the API returns a `429 Too Many Requests`
+    response. Unauthenticated requests are limited to 60 requests per minute per IP address.
+
+    ## Pagination
+
+    List endpoints that support pagination accept `page` and `per_page` query parameters.
+    The response includes a `meta` object with pagination details.
+  title: Nitrozen API
+  version: 1.0.0
+servers:
+- url: https://nitrozen.io/api/v1
+security:
+- BearerAuth: []
+tags:
+- description: API token management
+  name: Authentication
+- description: User profile and usage
+  name: Users
+- description: Changelog project management
+  name: Projects
+- description: Changelog entry management
+  name: Entries
+- description: Public endpoints (no authentication required)
+  name: Public
+paths:
+  /user:
+    get:
+      description: Returns the authenticated user's profile and plan details.
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                data:
+                  id: 1
+                  name: John Doe
+                  email: john@example.com
+                  plan:
+                    id: 2
+                    name: Pro
+                    plan_type: subscription
+                    max_projects: 10
+                    max_entries_per_month: 100
+                    custom_domain_allowed: true
+                    analytics_enabled: true
+                    api_access_enabled: true
+                    api_rate_limit: 60
+                  created_at: 2025-01-15T10:30:00+00:00
+              schema:
+                $ref: "#/components/schemas/_user_get_200_response"
+          description: User profile
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Get current user
+      tags:
+      - Users
+  /user/usage:
+    get:
+      description: Returns current usage counts and plan limits.
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                data:
+                  projects_count: 3
+                  entries_this_month: 12
+                  limits:
+                    max_projects: 10
+                    max_entries_per_month: 100
+                  plan_name: Pro
+              schema:
+                $ref: "#/components/schemas/_user_usage_get_200_response"
+          description: Usage statistics
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Get usage statistics
+      tags:
+      - Users
+  /projects:
+    get:
+      description: Returns all projects owned by the authenticated user.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects_get_200_response"
+          description: List of projects
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: List projects
+      tags:
+      - Projects
+    post:
+      description: Creates a new changelog project. The slug is auto-generated from
+        the name.
+      requestBody:
+        content:
+          application/json:
+            example:
+              name: My Product
+              description: Changelog for My Product
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects_post_201_response"
+          description: Project created
+        "403":
+          content:
+            application/json:
+              example:
+                message: You have reached your plan's limit of 3 project(s). Upgrade
+                  your plan to create more.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Plan limit reached
+        "422":
+          content:
+            application/json:
+              example:
+                message: Validation failed.
+                errors:
+                  name:
+                  - The name field is required.
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+          description: Validation failed
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Create a project
+      tags:
+      - Projects
+  /projects/{project}:
+    delete:
+      description: Permanently deletes a project and all its entries.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Project deleted
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Access denied
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Delete a project
+      tags:
+      - Projects
+    get:
+      description: Returns a single project by ID.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects_post_201_response"
+          description: Project details
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Access denied
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Get a project
+      tags:
+      - Projects
+    put:
+      description: Updates an existing project's name and description.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects_post_201_response"
+          description: Project updated
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Access denied
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "422":
+          content:
+            application/json:
+              example:
+                message: Validation failed.
+                errors:
+                  name:
+                  - The name field is required.
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+          description: Validation failed
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Update a project
+      tags:
+      - Projects
+  /projects/{project}/entries:
+    get:
+      description: Returns entries for a project with optional filtering and pagination.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: Filter by category
+        explode: true
+        in: query
+        name: category
+        required: false
+        schema:
+          enum:
+          - new
+          - improvement
+          - fix
+          - announcement
+          type: string
+        style: form
+      - description: Filter by publish status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          enum:
+          - published
+          - draft
+          type: string
+        style: form
+      - description: Page number
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          type: integer
+        style: form
+      - description: Items per page
+        explode: true
+        in: query
+        name: per_page
+        required: false
+        schema:
+          default: 15
+          maximum: 100
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects__project__entries_get_200_response"
+          description: Paginated list of entries
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Access denied
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: List entries
+      tags:
+      - Entries
+    post:
+      description: |
+        Creates a new changelog entry. Set `is_published` to `true` to publish immediately.
+        If `published_at` is not provided for a published entry, it defaults to the current time.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            example:
+              title: Dark mode support
+              content: We've added dark mode across the entire application.
+              category: new
+              is_published: true
+            schema:
+              $ref: "#/components/schemas/EntryInput"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects__project__entries_post_201_response"
+          description: Entry created
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Plan limit reached or forbidden
+        "422":
+          content:
+            application/json:
+              example:
+                message: Validation failed.
+                errors:
+                  name:
+                  - The name field is required.
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+          description: Validation failed
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Create an entry
+      tags:
+      - Entries
+  /projects/{project}/entries/{entry}:
+    delete:
+      description: Permanently deletes a changelog entry.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: Entry ID
+        explode: false
+        in: path
+        name: entry
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Entry deleted
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Access denied
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Delete an entry
+      tags:
+      - Entries
+    get:
+      description: Returns a single entry by ID.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: Entry ID
+        explode: false
+        in: path
+        name: entry
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects__project__entries_post_201_response"
+          description: Entry details
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Access denied
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Get an entry
+      tags:
+      - Entries
+    put:
+      description: Updates an existing changelog entry.
+      parameters:
+      - description: Project ID
+        explode: false
+        in: path
+        name: project
+        required: true
+        schema:
+          type: integer
+        style: simple
+      - description: Entry ID
+        explode: false
+        in: path
+        name: entry
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntryInput"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_projects__project__entries_post_201_response"
+          description: Entry updated
+        "403":
+          content:
+            application/json:
+              example:
+                message: Forbidden.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Access denied
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "422":
+          content:
+            application/json:
+              example:
+                message: Validation failed.
+                errors:
+                  name:
+                  - The name field is required.
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+          description: Validation failed
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Update an entry
+      tags:
+      - Entries
+  /tokens:
+    get:
+      description: Returns all API tokens for the authenticated user. Token values
+        are not included.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_tokens_get_200_response"
+          description: List of tokens
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: List API tokens
+      tags:
+      - Authentication
+    post:
+      description: |
+        Creates a new API token. The plain-text token is only returned in this response
+        and cannot be retrieved later.
+      requestBody:
+        content:
+          application/json:
+            example:
+              name: CI/CD Pipeline
+            schema:
+              $ref: "#/components/schemas/_tokens_post_request"
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              example:
+                data:
+                  id: 5
+                  name: CI/CD Pipeline
+                  token: 1|abc123def456...
+                  created_at: 2025-06-01T12:00:00+00:00
+              schema:
+                $ref: "#/components/schemas/_tokens_post_201_response"
+          description: Token created
+        "422":
+          content:
+            application/json:
+              example:
+                message: Validation failed.
+                errors:
+                  name:
+                  - The name field is required.
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+          description: Validation failed
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Create an API token
+      tags:
+      - Authentication
+  /tokens/{token}:
+    delete:
+      description: Permanently revokes an API token. Any requests using this token
+        will be rejected.
+      parameters:
+      - description: Token ID
+        explode: false
+        in: path
+        name: token
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Token revoked
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+        "401":
+          content:
+            application/json:
+              example:
+                message: Unauthenticated.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Not authenticated
+      summary: Revoke an API token
+      tags:
+      - Authentication
+  /public/projects/{slug}/entries:
+    get:
+      description: Returns all published entries for a project. No authentication
+        required.
+      parameters:
+      - description: Project slug
+        explode: false
+        in: path
+        name: slug
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/_public_projects__slug__entries_get_200_response"
+          description: List of published entries
+        "404":
+          content:
+            application/json:
+              example:
+                message: Not found.
+              schema:
+                $ref: "#/components/schemas/Error"
+          description: Resource not found
+      security: []
+      summary: List published entries (public)
+      tags:
+      - Public
+components:
+  responses:
+    Unauthenticated:
+      content:
+        application/json:
+          example:
+            message: Unauthenticated.
+          schema:
+            $ref: "#/components/schemas/Error"
+      description: Not authenticated
+    Forbidden:
+      content:
+        application/json:
+          example:
+            message: Forbidden.
+          schema:
+            $ref: "#/components/schemas/Error"
+      description: Access denied
+    NotFound:
+      content:
+        application/json:
+          example:
+            message: Not found.
+          schema:
+            $ref: "#/components/schemas/Error"
+      description: Resource not found
+    ValidationError:
+      content:
+        application/json:
+          example:
+            message: Validation failed.
+            errors:
+              name:
+              - The name field is required.
+          schema:
+            $ref: "#/components/schemas/ValidationError"
+      description: Validation failed
+  schemas:
+    User:
+      example:
+        name: name
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        plan:
+          max_entries_per_month: 5
+          plan_type: free
+          max_projects: 1
+          analytics_enabled: true
+          api_rate_limit: 5
+          name: name
+          custom_domain_allowed: true
+          id: 6
+          api_access_enabled: true
+        email: email
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          format: email
+          type: string
+        plan:
+          $ref: "#/components/schemas/User_plan"
+        created_at:
+          format: date-time
+          type: string
+      type: object
+    Usage:
+      example:
+        entries_this_month: 6
+        projects_count: 0
+        limits:
+          max_entries_per_month: 5
+          max_projects: 1
+        plan_name: plan_name
+      properties:
+        projects_count:
+          type: integer
+        entries_this_month:
+          type: integer
+        limits:
+          $ref: "#/components/schemas/Usage_limits"
+        plan_name:
+          type: string
+      type: object
+    Project:
+      example:
+        entries_count: 6
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        name: name
+        description: description
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        domain_verification_status: pending
+        custom_domain: custom_domain
+        slug: slug
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        description:
+          nullable: true
+          type: string
+        custom_domain:
+          nullable: true
+          type: string
+        domain_verification_status:
+          enum:
+          - pending
+          - verified
+          - failed
+          - null
+          nullable: true
+          type: string
+        entries_count:
+          type: integer
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      type: object
+    ProjectInput:
+      example:
+        name: name
+        description: description
+      properties:
+        name:
+          maxLength: 255
+          type: string
+        description:
+          maxLength: 1000
+          nullable: true
+          type: string
+      required:
+      - name
+      type: object
+    Entry:
+      example:
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        is_published: true
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        title: title
+        category: new
+        published_at: 2000-01-23T04:56:07.000+00:00
+        content: content
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        category:
+          enum:
+          - new
+          - improvement
+          - fix
+          - announcement
+          type: string
+        is_published:
+          type: boolean
+        published_at:
+          format: date-time
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          type: string
+        updated_at:
+          format: date-time
+          type: string
+      type: object
+    EntryInput:
+      example:
+        is_published: false
+        title: title
+        category: new
+        published_at: 2000-01-23T04:56:07.000+00:00
+        content: content
+      properties:
+        title:
+          maxLength: 255
+          type: string
+        content:
+          type: string
+        category:
+          enum:
+          - new
+          - improvement
+          - fix
+          - announcement
+          type: string
+        is_published:
+          default: false
+          type: boolean
+        published_at:
+          description: Defaults to current time if is_published is true and this is
+            not set.
+          format: date-time
+          nullable: true
+          type: string
+      required:
+      - category
+      - content
+      - title
+      type: object
+    TokenInfo:
+      example:
+        last_used_at: 2000-01-23T04:56:07.000+00:00
+        name: name
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        last_used_at:
+          format: date-time
+          nullable: true
+          type: string
+        created_at:
+          format: date-time
+          type: string
+      type: object
+    NewToken:
+      example:
+        name: name
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        token: token
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        token:
+          description: The plain-text token. Only shown once.
+          type: string
+        created_at:
+          format: date-time
+          type: string
+      type: object
+    PaginationMeta:
+      example:
+        per_page: 5
+        total: 5
+        last_page: 1
+        current_page: 6
+      properties:
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+      type: object
+    Error:
+      example:
+        message: message
+      properties:
+        message:
+          type: string
+      type: object
+    ValidationError:
+      example:
+        message: message
+        errors:
+          key:
+          - errors
+          - errors
+      properties:
+        message:
+          type: string
+        errors:
+          additionalProperties:
+            items:
+              type: string
+            type: array
+          type: object
+      type: object
+    _user_get_200_response:
+      example:
+        data:
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          plan:
+            max_entries_per_month: 5
+            plan_type: free
+            max_projects: 1
+            analytics_enabled: true
+            api_rate_limit: 5
+            name: name
+            custom_domain_allowed: true
+            id: 6
+            api_access_enabled: true
+          email: email
+      properties:
+        data:
+          $ref: "#/components/schemas/User"
+      type: object
+    _user_usage_get_200_response:
+      example:
+        data:
+          entries_this_month: 6
+          projects_count: 0
+          limits:
+            max_entries_per_month: 5
+            max_projects: 1
+          plan_name: plan_name
+      properties:
+        data:
+          $ref: "#/components/schemas/Usage"
+      type: object
+    _projects_get_200_response:
+      example:
+        data:
+        - entries_count: 6
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          domain_verification_status: pending
+          custom_domain: custom_domain
+          slug: slug
+        - entries_count: 6
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          domain_verification_status: pending
+          custom_domain: custom_domain
+          slug: slug
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Project"
+          type: array
+      type: object
+    _projects_post_201_response:
+      example:
+        data:
+          entries_count: 6
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          description: description
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          domain_verification_status: pending
+          custom_domain: custom_domain
+          slug: slug
+      properties:
+        data:
+          $ref: "#/components/schemas/Project"
+      type: object
+    _projects__project__entries_get_200_response:
+      example:
+        data:
+        - updated_at: 2000-01-23T04:56:07.000+00:00
+          is_published: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          title: title
+          category: new
+          published_at: 2000-01-23T04:56:07.000+00:00
+          content: content
+        - updated_at: 2000-01-23T04:56:07.000+00:00
+          is_published: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          title: title
+          category: new
+          published_at: 2000-01-23T04:56:07.000+00:00
+          content: content
+        meta:
+          per_page: 5
+          total: 5
+          last_page: 1
+          current_page: 6
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Entry"
+          type: array
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+      type: object
+    _projects__project__entries_post_201_response:
+      example:
+        data:
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          is_published: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          title: title
+          category: new
+          published_at: 2000-01-23T04:56:07.000+00:00
+          content: content
+      properties:
+        data:
+          $ref: "#/components/schemas/Entry"
+      type: object
+    _tokens_get_200_response:
+      example:
+        data:
+        - last_used_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+        - last_used_at: 2000-01-23T04:56:07.000+00:00
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/TokenInfo"
+          type: array
+      type: object
+    _tokens_post_request:
+      properties:
+        name:
+          description: A descriptive name for the token
+          maxLength: 255
+          type: string
+      required:
+      - name
+      type: object
+    _tokens_post_201_response:
+      example:
+        data:
+          name: name
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          token: token
+      properties:
+        data:
+          $ref: "#/components/schemas/NewToken"
+      type: object
+    _public_projects__slug__entries_get_200_response:
+      example:
+        data:
+        - updated_at: 2000-01-23T04:56:07.000+00:00
+          is_published: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          title: title
+          category: new
+          published_at: 2000-01-23T04:56:07.000+00:00
+          content: content
+        - updated_at: 2000-01-23T04:56:07.000+00:00
+          is_published: true
+          created_at: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          title: title
+          category: new
+          published_at: 2000-01-23T04:56:07.000+00:00
+          content: content
+      properties:
+        data:
+          items:
+            $ref: "#/components/schemas/Entry"
+          type: array
+      type: object
+    User_plan:
+      example:
+        max_entries_per_month: 5
+        plan_type: free
+        max_projects: 1
+        analytics_enabled: true
+        api_rate_limit: 5
+        name: name
+        custom_domain_allowed: true
+        id: 6
+        api_access_enabled: true
+      nullable: true
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        plan_type:
+          enum:
+          - free
+          - subscription
+          - lifetime
+          type: string
+        max_projects:
+          type: integer
+        max_entries_per_month:
+          type: integer
+        custom_domain_allowed:
+          type: boolean
+        analytics_enabled:
+          type: boolean
+        api_access_enabled:
+          type: boolean
+        api_rate_limit:
+          description: Maximum API requests per minute for this plan
+          type: integer
+      type: object
+    Usage_limits:
+      example:
+        max_entries_per_month: 5
+        max_projects: 1
+      properties:
+        max_projects:
+          type: integer
+        max_entries_per_month:
+          type: integer
+      type: object
+  securitySchemes:
+    BearerAuth:
+      description: "Use an API token from your [API Tokens](/api-tokens) page."
+      scheme: bearer
+      type: http

@@ -268,7 +268,7 @@ func (a *AuthenticationAPIService) TokensPostExecute(r ApiTokensPostRequest) (*T
 type ApiTokensTokenDeleteRequest struct {
 	ctx context.Context
 	ApiService *AuthenticationAPIService
-	token int32
+	token string
 }
 
 func (r ApiTokensTokenDeleteRequest) Execute() (*http.Response, error) {
@@ -284,7 +284,7 @@ Permanently revokes an API token. Any requests using this token will be rejected
  @param token Token ID
  @return ApiTokensTokenDeleteRequest
 */
-func (a *AuthenticationAPIService) TokensTokenDelete(ctx context.Context, token int32) ApiTokensTokenDeleteRequest {
+func (a *AuthenticationAPIService) TokensTokenDelete(ctx context.Context, token string) ApiTokensTokenDeleteRequest {
 	return ApiTokensTokenDeleteRequest{
 		ApiService: a,
 		ctx: ctx,

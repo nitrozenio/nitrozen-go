@@ -20,7 +20,7 @@ var _ MappedNullable = &NewToken{}
 
 // NewToken struct for NewToken
 type NewToken struct {
-	Id *int32 `json:"id,omitempty"`
+	Id *string `json:"id,omitempty"`
 	Name *string `json:"name,omitempty"`
 	// The plain-text token. Only shown once.
 	Token *string `json:"token,omitempty"`
@@ -45,9 +45,9 @@ func NewNewTokenWithDefaults() *NewToken {
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *NewToken) GetId() int32 {
+func (o *NewToken) GetId() string {
 	if o == nil || IsNil(o.Id) {
-		var ret int32
+		var ret string
 		return ret
 	}
 	return *o.Id
@@ -55,7 +55,7 @@ func (o *NewToken) GetId() int32 {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *NewToken) GetIdOk() (*int32, bool) {
+func (o *NewToken) GetIdOk() (*string, bool) {
 	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
@@ -71,8 +71,8 @@ func (o *NewToken) HasId() bool {
 	return false
 }
 
-// SetId gets a reference to the given int32 and assigns it to the Id field.
-func (o *NewToken) SetId(v int32) {
+// SetId gets a reference to the given string and assigns it to the Id field.
+func (o *NewToken) SetId(v string) {
 	o.Id = &v
 }
 

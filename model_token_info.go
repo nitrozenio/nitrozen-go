@@ -20,7 +20,7 @@ var _ MappedNullable = &TokenInfo{}
 
 // TokenInfo struct for TokenInfo
 type TokenInfo struct {
-	Id *int32 `json:"id,omitempty"`
+	Id *string `json:"id,omitempty"`
 	Name *string `json:"name,omitempty"`
 	LastUsedAt NullableTime `json:"last_used_at,omitempty"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
@@ -44,9 +44,9 @@ func NewTokenInfoWithDefaults() *TokenInfo {
 }
 
 // GetId returns the Id field value if set, zero value otherwise.
-func (o *TokenInfo) GetId() int32 {
+func (o *TokenInfo) GetId() string {
 	if o == nil || IsNil(o.Id) {
-		var ret int32
+		var ret string
 		return ret
 	}
 	return *o.Id
@@ -54,7 +54,7 @@ func (o *TokenInfo) GetId() int32 {
 
 // GetIdOk returns a tuple with the Id field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TokenInfo) GetIdOk() (*int32, bool) {
+func (o *TokenInfo) GetIdOk() (*string, bool) {
 	if o == nil || IsNil(o.Id) {
 		return nil, false
 	}
@@ -71,7 +71,7 @@ func (o *TokenInfo) HasId() bool {
 }
 
 // SetId gets a reference to the given int32 and assigns it to the Id field.
-func (o *TokenInfo) SetId(v int32) {
+func (o *TokenInfo) SetId(v string) {
 	o.Id = &v
 }
 

@@ -22,3 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+# OpenAPI Generator artifacts — not part of the published SDK
+git_push.sh
+.openapi-generator/

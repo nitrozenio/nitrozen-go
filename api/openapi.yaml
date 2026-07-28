@@ -340,17 +340,13 @@ paths:
         schema:
           type: integer
         style: simple
-      - description: Filter by category
+      - description: |
+          Filter by category slug. Every project has the built-in categories `new`, `improvement`, `fix`, and `announcement`; projects on plans with custom categories enabled may also have additional project-specific slugs.
         explode: true
         in: query
         name: category
         required: false
         schema:
-          enum:
-          - new
-          - improvement
-          - fix
-          - announcement
           type: string
         style: form
       - description: Filter by publish status
@@ -937,11 +933,9 @@ components:
         content:
           type: string
         category:
-          enum:
-          - new
-          - improvement
-          - fix
-          - announcement
+          description: |
+            The entry's category slug. Every project has the built-in categories `new`, `improvement`, `fix`, and `announcement`; projects on plans with custom categories enabled may also define additional project-specific slugs.
+          example: new
           type: string
         is_published:
           type: boolean
@@ -970,11 +964,9 @@ components:
         content:
           type: string
         category:
-          enum:
-          - new
-          - improvement
-          - fix
-          - announcement
+          description: |
+            The category slug to file this entry under. Every project has the built-in categories `new`, `improvement`, `fix`, and `announcement`; projects on plans with custom categories enabled may also define additional project-specific slugs (see the project's dashboard for the full list).
+          example: new
           type: string
         is_published:
           default: false

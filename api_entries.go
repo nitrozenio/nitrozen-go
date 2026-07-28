@@ -461,7 +461,7 @@ type ApiProjectsProjectEntriesGetRequest struct {
 	perPage *int32
 }
 
-// Filter by category
+// Filter by category slug. Every project has the built-in categories &#x60;new&#x60;, &#x60;improvement&#x60;, &#x60;fix&#x60;, and &#x60;announcement&#x60;; projects on plans with custom categories enabled may also have additional project-specific slugs. 
 func (r ApiProjectsProjectEntriesGetRequest) Category(category string) ApiProjectsProjectEntriesGetRequest {
 	r.category = &category
 	return r

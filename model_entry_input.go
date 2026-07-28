@@ -24,6 +24,7 @@ var _ MappedNullable = &EntryInput{}
 type EntryInput struct {
 	Title string `json:"title"`
 	Content string `json:"content"`
+	// The category slug to file this entry under. Every project has the built-in categories `new`, `improvement`, `fix`, and `announcement`; projects on plans with custom categories enabled may also define additional project-specific slugs (see the project's dashboard for the full list). 
 	Category string `json:"category"`
 	IsPublished *bool `json:"is_published,omitempty"`
 	// Defaults to current time if is_published is true and this is not set.

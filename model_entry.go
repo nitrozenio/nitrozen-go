@@ -23,6 +23,7 @@ type Entry struct {
 	Id *int32 `json:"id,omitempty"`
 	Title *string `json:"title,omitempty"`
 	Content *string `json:"content,omitempty"`
+	// The entry's category slug. Every project has the built-in categories `new`, `improvement`, `fix`, and `announcement`; projects on plans with custom categories enabled may also define additional project-specific slugs. 
 	Category *string `json:"category,omitempty"`
 	IsPublished *bool `json:"is_published,omitempty"`
 	PublishedAt NullableTime `json:"published_at,omitempty"`

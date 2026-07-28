@@ -179,7 +179,7 @@ import (
 func main() {
 	project := int32(56) // int32 | Project ID
 	entry := int32(56) // int32 | Entry ID
-	entryInput := *openapiclient.NewEntryInput("Title_example", "Content_example", "Category_example") // EntryInput | 
+	entryInput := *openapiclient.NewEntryInput("Title_example", "Content_example", "new") // EntryInput | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
@@ -253,7 +253,7 @@ import (
 
 func main() {
 	project := int32(56) // int32 | Project ID
-	category := "category_example" // string | Filter by category (optional)
+	category := "category_example" // string | Filter by category slug. Every project has the built-in categories `new`, `improvement`, `fix`, and `announcement`; projects on plans with custom categories enabled may also have additional project-specific slugs.  (optional)
 	status := "status_example" // string | Filter by publish status (optional)
 	page := int32(56) // int32 | Page number (optional) (default to 1)
 	perPage := int32(56) // int32 | Items per page (optional) (default to 15)
@@ -286,7 +286,7 @@ Other parameters are passed through a pointer to a apiProjectsProjectEntriesGetR
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **category** | **string** | Filter by category | 
+ **category** | **string** | Filter by category slug. Every project has the built-in categories &#x60;new&#x60;, &#x60;improvement&#x60;, &#x60;fix&#x60;, and &#x60;announcement&#x60;; projects on plans with custom categories enabled may also have additional project-specific slugs.  | 
  **status** | **string** | Filter by publish status | 
  **page** | **int32** | Page number | [default to 1]
  **perPage** | **int32** | Items per page | [default to 15]
@@ -331,7 +331,7 @@ import (
 
 func main() {
 	project := int32(56) // int32 | Project ID
-	entryInput := *openapiclient.NewEntryInput("Title_example", "Content_example", "Category_example") // EntryInput | 
+	entryInput := *openapiclient.NewEntryInput("Title_example", "Content_example", "new") // EntryInput | 
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)

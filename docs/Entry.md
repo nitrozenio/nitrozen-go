@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **Id** | Pointer to **int32** |  | [optional] 
 **Title** | Pointer to **string** |  | [optional] 
 **Content** | Pointer to **string** |  | [optional] 
-**Category** | Pointer to **string** |  | [optional] 
+**Category** | Pointer to **string** | The entry&#39;s category slug. Every project has the built-in categories &#x60;new&#x60;, &#x60;improvement&#x60;, &#x60;fix&#x60;, and &#x60;announcement&#x60;; projects on plans with custom categories enabled may also define additional project-specific slugs.  | [optional] 
 **IsPublished** | Pointer to **bool** |  | [optional] 
 **PublishedAt** | Pointer to **NullableTime** |  | [optional] 
 **CreatedAt** | Pointer to **time.Time** |  | [optional] 

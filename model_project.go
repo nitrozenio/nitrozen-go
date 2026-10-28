@@ -23,6 +23,8 @@ type Project struct {
 	Id *int32 `json:"id,omitempty"`
 	Name *string `json:"name,omitempty"`
 	Slug *string `json:"slug,omitempty"`
+	// Public changelog page URL. `https://<custom_domain>` when the project's custom domain is verified, otherwise `https://nitrozen.io/c/<slug>`. Read-only; ignored on create and update.
+	PublicUrl *string `json:"public_url,omitempty"`
 	Description NullableString `json:"description,omitempty"`
 	CustomDomain NullableString `json:"custom_domain,omitempty"`
 	DomainVerificationStatus NullableString `json:"domain_verification_status,omitempty"`
@@ -142,6 +144,38 @@ func (o *Project) HasSlug() bool {
 // SetSlug gets a reference to the given string and assigns it to the Slug field.
 func (o *Project) SetSlug(v string) {
 	o.Slug = &v
+}
+
+// GetPublicUrl returns the PublicUrl field value if set, zero value otherwise.
+func (o *Project) GetPublicUrl() string {
+	if o == nil || IsNil(o.PublicUrl) {
+		var ret string
+		return ret
+	}
+	return *o.PublicUrl
+}
+
+// GetPublicUrlOk returns a tuple with the PublicUrl field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Project) GetPublicUrlOk() (*string, bool) {
+	if o == nil || IsNil(o.PublicUrl) {
+		return nil, false
+	}
+	return o.PublicUrl, true
+}
+
+// HasPublicUrl returns a boolean if a field has been set.
+func (o *Project) HasPublicUrl() bool {
+	if o != nil && !IsNil(o.PublicUrl) {
+		return true
+	}
+
+	return false
+}
+
+// SetPublicUrl gets a reference to the given string and assigns it to the PublicUrl field.
+func (o *Project) SetPublicUrl(v string) {
+	o.PublicUrl = &v
 }
 
 // GetDescription returns the Description field value if set, zero value otherwise (both if not set or set to explicit null).
@@ -384,6 +418,9 @@ func (o Project) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Slug) {
 		toSerialize["slug"] = o.Slug
+	}
+	if !IsNil(o.PublicUrl) {
+		toSerialize["public_url"] = o.PublicUrl
 	}
 	if o.Description.IsSet() {
 		toSerialize["description"] = o.Description.Get()

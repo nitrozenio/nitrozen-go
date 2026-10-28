@@ -861,6 +861,7 @@ components:
       type: object
     Project:
       example:
+        public_url: https://nitrozen.io/c/textproxyz
         entries_count: 6
         updated_at: 2000-01-23T04:56:07.000+00:00
         name: name
@@ -876,6 +877,14 @@ components:
         name:
           type: string
         slug:
+          type: string
+        public_url:
+          description: "Public changelog page URL. `https://<custom_domain>` when\
+            \ the project's custom domain is verified, otherwise `https://nitrozen.io/c/<slug>`.\
+            \ Read-only; ignored on create and update."
+          example: https://nitrozen.io/c/textproxyz
+          format: uri
+          readOnly: true
           type: string
         description:
           nullable: true
@@ -1096,7 +1105,8 @@ components:
     _projects_get_200_response:
       example:
         data:
-        - entries_count: 6
+        - public_url: https://nitrozen.io/c/textproxyz
+          entries_count: 6
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
           description: description
@@ -1105,7 +1115,8 @@ components:
           domain_verification_status: pending
           custom_domain: custom_domain
           slug: slug
-        - entries_count: 6
+        - public_url: https://nitrozen.io/c/textproxyz
+          entries_count: 6
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name
           description: description
@@ -1123,6 +1134,7 @@ components:
     _projects_post_201_response:
       example:
         data:
+          public_url: https://nitrozen.io/c/textproxyz
           entries_count: 6
           updated_at: 2000-01-23T04:56:07.000+00:00
           name: name

@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **Id** | Pointer to **int32** |  | [optional] 
 **Name** | Pointer to **string** |  | [optional] 
 **Slug** | Pointer to **string** |  | [optional] 
+**PublicUrl** | Pointer to **string** | Public changelog page URL. &#x60;https://&lt;custom_domain&gt;&#x60; when the project&#39;s custom domain is verified, otherwise &#x60;https://nitrozen.io/c/&lt;slug&gt;&#x60;. Read-only; ignored on create and update. | [optional] [readonly] 
 **Description** | Pointer to **NullableString** |  | [optional] 
 **CustomDomain** | Pointer to **NullableString** |  | [optional] 
 **DomainVerificationStatus** | Pointer to **NullableString** |  | [optional] 
@@ -107,6 +108,31 @@ SetSlug sets Slug field to given value.
 `func (o *Project) HasSlug() bool`
 
 HasSlug returns a boolean if a field has been set.
+
+### GetPublicUrl
+
+`func (o *Project) GetPublicUrl() string`
+
+GetPublicUrl returns the PublicUrl field if non-nil, zero value otherwise.
+
+### GetPublicUrlOk
+
+`func (o *Project) GetPublicUrlOk() (*string, bool)`
+
+GetPublicUrlOk returns a tuple with the PublicUrl field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPublicUrl
+
+`func (o *Project) SetPublicUrl(v string)`
+
+SetPublicUrl sets PublicUrl field to given value.
+
+### HasPublicUrl
+
+`func (o *Project) HasPublicUrl() bool`
+
+HasPublicUrl returns a boolean if a field has been set.
 
 ### GetDescription
 
